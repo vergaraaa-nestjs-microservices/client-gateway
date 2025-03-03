@@ -12,7 +12,7 @@ export class OrdersController {
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
     void createOrderDto;
-    return this.productsClient.send('createOrder', {});
+    return this.productsClient.send('createOrder', createOrderDto);
   }
 
   @Get()
