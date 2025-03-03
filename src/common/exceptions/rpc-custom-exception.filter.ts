@@ -19,9 +19,14 @@ export class RpcCustomExceptionFilter implements ExceptionFilter<RpcException> {
       return response.status(rpcError.status).json(rpcError);
     }
 
+    const message =
+      typeof rpcError === 'object' && 'message' in rpcError
+        ? rpcError.message
+        : rpcError;
+
     return response.status(500).json({
       statusCode: 500,
-      message: rpcError,
+      message: message,
     });
   }
 }
