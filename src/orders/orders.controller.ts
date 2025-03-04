@@ -36,7 +36,15 @@ export class OrdersController {
 
   @Get()
   findAll(@Query() ordersPaginationDto: OrdersPaginationDto) {
-    return this.client.send('findAllOrders', ordersPaginationDto);
+    return this.client.send('findAllOrders', ordersPaginationDto).pipe(
+      catchError((error) => {
+        if (typeof error === 'object') {
+          throw new RpcException(error as object);
+        }
+
+        throw new RpcException('Unknown error');
+      }),
+    );
   }
 
   @Get('/id/:id')

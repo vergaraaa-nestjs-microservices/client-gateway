@@ -25,7 +25,7 @@ export class RpcCustomExceptionFilter implements ExceptionFilter<RpcException> {
         : rpcError;
 
     return response.status(500).json({
-      statusCode: 500,
+      status: 500,
       message: message,
     });
   }
