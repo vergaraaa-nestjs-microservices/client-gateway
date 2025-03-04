@@ -20,23 +20,30 @@ import { StatusDto } from './dto/status.dto';
 @Controller('orders')
 export class OrdersController {
   constructor(
-    @Inject(ORDERS_SERVICE) private readonly productsClient: ClientProxy,
+    @Inject(ORDERS_SERVICE) private readonly ordersClient: ClientProxy,
   ) {}
 
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
-    void createOrderDto;
-    return this.productsClient.send('createOrder', createOrderDto);
+    return this.ordersClient.send('createOrder', createOrderDto).pipe(
+      catchError((error) => {
+        if (typeof error === 'object') {
+          throw new RpcException(error as object);
+        }
+
+        throw new RpcException('Unknown error');
+      }),
+    );
   }
 
   @Get()
   findAll(@Query() ordersPaginationDto: OrdersPaginationDto) {
-    return this.productsClient.send('findAllOrders', ordersPaginationDto);
+    return this.ordersClient.send('findAllOrders', ordersPaginationDto);
   }
 
   @Get('/id/:id')
   findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.productsClient.send('findOneOrder', id).pipe(
+    return this.ordersClient.send('findOneOrder', id).pipe(
       catchError((error) => {
         if (typeof error === 'object') {
           throw new RpcException(error as object);
@@ -52,7 +59,7 @@ export class OrdersController {
     @Param() statusDto: StatusDto,
     @Query() paginationDto: PaginationDto,
   ) {
-    return this.productsClient
+    return this.ordersClient
       .send('findAllOrders', {
         ...paginationDto,
         status: statusDto.status,
@@ -73,7 +80,7 @@ export class OrdersController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() statusDto: StatusDto,
   ) {
-    return this.productsClient
+    return this.ordersClient
       .send('changeOrderStatus', {
         id,
         status: statusDto.status,
